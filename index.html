@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tom & Jerry AI Owner</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f7f9fc; text-align: center; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        h1 { color: #ff9800; font-size: 2.5em; margin-bottom: 10px; }
+        textarea { width: 100%; height: 100px; padding: 15px; border-radius: 12px; border: 2px solid #ddd; margin-bottom: 20px; font-size: 16px; box-sizing: border-box; }
+        .btn-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        button { background-color: #ff9800; color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; transition: 0.3s; }
+        button:hover { background-color: #e68a00; transform: translateY(-2px); }
+        .download-btn { background-color: #4CAF50; display: none; }
+        .download-btn:hover { background-color: #45a049; }
+        #image-container { margin-top: 30px; }
+        img { max-width: 100%; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: none; border: 5px solid white; }
+        .loading { display: none; color: #666; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🐱 Tom & Jerry AI 🐭</h1>
+    <p>Write a story and let AI draw it for you!</p>
+    
+    <textarea id="storyInput" placeholder="Example: Tom and Jerry eating dinner together on a big table..."></textarea>
+    
+    <div class="btn-group">
+        <button onclick="generateCartoon()">Generate Image</button>
+        <button id="downloadBtn" class="download-btn" onclick="downloadImage()">Download ⬇️</button>
+    </div>
+
+    <div id="image-container">
+        <p class="loading" id="loadingText">🎨 AI is painting your idea... please wait...</p>
+        <img id="outputImage" src="" alt="AI Generated Tom and Jerry">
+    </div>
+</div>
+
+<script>
+    function generateCartoon() {
+        const story = document.getElementById('storyInput').value;
+        const loadingText = document.getElementById('loadingText');
+        const outputImage = document.getElementById('outputImage');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        if (!story) {
+            alert("Please write a story first!");
+            return;
+        }
+
+        loadingText.style.display = "block";
+        outputImage.style.display = "none";
+        downloadBtn.style.display = "none";
+
+        const style = "highly detailed classic 1950s Tom and Jerry cartoon animation style, vibrant colors, slapstick comedy scene, MGM style";
+        const seed = Math.floor(Math.random() * 1000000);
+        const finalPrompt = encodeURIComponent(story + ", " + style);
+        
+        const imageUrl = `https://image.pollinations.ai/prompt/${finalPrompt}?width=1024&height=1024&nologo=true&seed=${seed}`;
+
+        outputImage.src = imageUrl;
+
+        outputImage.onload = function() {
+            loadingText.style.display = "none";
+            outputImage.style.display = "block";
+            downloadBtn.style.display = "inline-block";
+        };
+    }
+
+    async function downloadImage() {
+        const image = document.getElementById('outputImage');
+        const response = await fetch(image.src);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Tom_and_Jerry_AI.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
+</script>
+
+</body>
+</html>
